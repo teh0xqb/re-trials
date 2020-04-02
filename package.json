@@ -9,7 +9,7 @@
         "node": ">=12"
     },
     "scripts": {
-        "sass": "node-sass src/scss/site.scss target/css/site.css",
+        "sass": "node-sass src/sass/site.scss target/css/site.css",
         "sass:watch": "yarn sass -w",
         "release": "shadow-cljs release app && npm run sass",
         "cp-static": "mkdir -p target && cp -r resources/public/* target/",

@@ -4,8 +4,12 @@
             [cljs.core.async :as async]
             ))
 
-(defn a
+(defn root-component []
+  [:div
+   [:p "Hello World"]])
+
+(defn mount-tree
   "mount root node for reagent tree"
-  (r/render [root-component] (js/))
-  )
+  []
+  (r/render [root-component] (js/document.getElementById "app")))
 

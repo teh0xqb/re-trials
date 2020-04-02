@@ -1,9 +1,10 @@
-(ns retrials.core)
+(ns retrials.core
+  (:require [retrials.lib :as lib]))
 
 (defn main!
   ""
   []
-  nil)
+  (lib/mount-tree))
 
 (defn reload!
   []
