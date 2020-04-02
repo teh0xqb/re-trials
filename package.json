@@ -1,0 +1,34 @@
+{
+    "name": "re-trials",
+    "version": "0.0.1",
+    "main": "index.js",
+    "author": "Joel",
+    "license": "MIT",
+    "private": true,
+    "engines": {
+        "node": ">=12"
+    },
+    "scripts": {
+        "sass": "node-sass src/scss/site.scss target/css/site.css",
+        "sass:watch": "yarn sass -w",
+        "release": "shadow-cljs release app && npm run sass",
+        "cp-static": "mkdir -p target && cp -r resources/public/* target/",
+        "serve": "yarn cp-static && http-server --port 8081 target/",
+        "dev:compile": "shadow-cljs compile app",
+        "dev:watch": "shadow-cljs watch app",
+        "build:clean": "rm -r target/*",
+        "build:serve": "yarn release && yarn cp-static && yarn serve",
+        "release:report": "shadow-cljs run shadow.cljs.build-report app report.html"
+    },
+    "dependencies": {
+        "@material-ui/core": "4.9.7",
+        "@material-ui/icons": "4.9.1",
+        "react": "16.9.0",
+        "react-dom": "16.9.0"
+    },
+    "devDependencies": {
+        "shadow-cljs": "2.8.94",
+        "http-server": "0.12.1",
+        "node-sass": "4.13.1"
+    }
+}

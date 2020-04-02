@@ -1,0 +1,60 @@
+// @import 'partial'; // _partial.scss
+
+$font-stack: 'Open Sans',sans-serif;
+$base-font-size: 1.125em;
+
+html, body {
+
+    background-color: #fcfcfc;
+    box-sizing: border-box;
+
+    font-family: $font-stack;
+    font-style: normal;
+
+    @media only screen and (max-width: 450px) {
+        font-size: 100%;
+    }
+    @media only screen and (min-width: 1000px) {
+        font-size: 120%;
+    }
+    @media only screen and (min-width: 1600px) {
+        font-size: 160%;
+    }
+    @media only screen and (min-width: 1800px) {
+        font-size: 200%;
+    }
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+h1, h2, h3 {
+
+    /* &::before { */
+    /*     content: "# "; */
+    /* } */
+
+}
+
+p {
+    margin: auto;
+    padding: 0;
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+}
+
+li {
+    list-style: none;
+}
+
+a {
+    color: #09f;
+}
+
+input {
+    font-family: $font-stack;
+}

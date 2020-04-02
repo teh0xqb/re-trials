@@ -1,0 +1,20 @@
+{:source-paths ["src/cljs"]
+
+ :dependencies [
+                [reagent "0.9.0-rc3"] ;; react
+                [reagent-utils "0.3.3"]
+
+                [cljs-http "0.1.46"] ;; w/ async channels; instead of fetch
+                ]
+ :nrepl        {:port 9001}
+
+ :dev-http {8080 "target/"}
+
+ :builds {:app {:output-dir "target/js"
+                :asset-path "."
+                :target :browser
+                :modules {:main {:init-fn retrials.core/main!}}
+                :devtools {:after-load retrials.core/reload!}
+
+                :release {:compiler-options {:optimizations :advanced
+                                             :infer-externs :auto}}}}}
