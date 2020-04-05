@@ -29,12 +29,20 @@ html, body {
     box-sizing: inherit;
 }
 
-h1, h2, h3 {
+body {
+    margin: auto;
+    padding: 0;
+}
 
+.body-container {
+    margin: auto;
+    padding: 1em;
+}
+
+h1, h2, h3 {
     &::before {
         content: "# ";
     }
-
 }
 
 p {

@@ -1,25 +1,23 @@
-# Retrials
+# Re-trials
 
-Foobar is a library for dealing with life.
+Demo task, using cljs' reagent and cljs-http to consume a REST api and display / edit values.
 
 ## Installation
 
-Use the package manager [npm](https://npm.com/) to install foobar.
+Use the npm or yarn package managers to install:
 
 ```bash
 yarn install
 ```
 
-## Usage
+See package.json's scripts for all available dev and release tasks.
 
-```cljs
-(require '[foo.bar])
-```
-
+## Release
+_TODO
 ## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
+_TODO
+### Development
+_TODO
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)

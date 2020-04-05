@@ -4,19 +4,23 @@
             [cljs.core.async :as async]
             [cljs.pprint :refer [pprint]]
 
-            ["@material-ui/core/Table" :default Table]
-            ["@material-ui/core/TableCell" :default TableCell]
-            ["@material-ui/core/TableContainer" :default TableContainer]
-            ["@material-ui/core/TableHead" :default TableHead]
-            ["@material-ui/core/TableRow" :default TableRow]
-            ["@material-ui/core/TableBody" :default TableBody]))
+            [retrials.app-bar :refer [app-bar]]
+            [retrials.listings :refer [trials-listings]]
+
+            ["@material-ui/core/Grid" :default Grid]
+            ["@material-ui/core/Typography" :default Typography]
+            ["@material-ui/core/styles" :refer [withStyles]]))
 
 
-(defonce global-store (r/atom []))
+(defonce global-store (r/atom [{:id 1, :name "No-AFTS-Here", :description "FOO", :archived true}
+                               {:id 2, :name "second", :description "BAR", :archived false} ]))
+
+;; TODO mock the store
+;; TODO define config for urls and constants
 
 ;; hydrate the store (init)
 ;; could be renamed to fetch
-(defn hydrate [] (async/go
+(defn hydrate [] nil #_(async/go
                    (let [response (async/<! (client/get "https://5dc26490.ngrok.io/trials"))]
                      (println response)
                      (when (:success response)
@@ -26,60 +30,24 @@
 (add-watch global-store :global-store-watcher (fn [key atom old-state new-state]
                                      (pprint new-state)))
 
-(def columns ["Name" "Description" "Archived?"])
 
-(defn trials-listings []
-  (let [trials @global-store]
-    [:> TableContainer
-     [:> Table
-      [:> TableHead
-       [:> TableRow
-        (for [column columns]
-          ^{:key column}
-          [:> TableCell column])]]
-      [:> TableBody
-       (for [trial trials]
-         ^{:key (:id trial)}
-         [:> TableRow
-          [:> TableCell (:name trial)]
-          [:> TableCell (:description trial)]
-          [:> TableCell (str (:archived trial))]])]]]))
-
-
-(defn edit-trial! [{:keys [id name]}]
-  (client/post (str "https://5dc26490.ngrok.io/trial/" id) {:json-params {:name name}}))
-
-(defn edit-form []
-  (let [id (r/atom "") ;; swap these atoms on-change below
-        name (r/atom "")]
-    ;; TODO Define handler for button to call edit-trial!
-    ;; TODO handle async -> when 200, show success and refresh the store. when error, display err string
-    (fn []
-      [:div
-
-       [:h3 "Indicate trial fields to edit" ]
-
-       [:label {:for "trial-id"} "id"]
-       [:input {:id "trial-id" :value @id}] ;; needs on change
-
-       [:br]
-
-       [:label {:for "trial-name"} "name"]
-       [:input {:id "trial-name" :value @name}] ;; needs on change to be fully controlled
-
-       [:br]
-       [:button {:on-click identity} "Edit Trial"]
-
-       ])))
-
-;; (comment "edit-trial!: run post call with id param above")
+(defn edit-trial!
+  "Received complete or partial info of a trial, and edits it on the server."
+  [{:keys [id] :as trial}]
+  (println "submiting trial " trial)
+  (client/post (str "https://5dc26490.ngrok.io/trial/" id) {:json-params trial}))
 
 (defn root-component []
   [:div
-   [:p "Hello World"]
-   [trials-listings]
+   [app-bar]
 
-   [edit-form]])
+   [:div.body-container
+    [:> Typography
+     {:variant "h4"
+      :gutterBottom true}
+     "Re-Trials Explorer"]
+
+    [trials-listings @global-store edit-trial!]]])
 
 (defn mount-tree
   "mount root node for reagent tree"
