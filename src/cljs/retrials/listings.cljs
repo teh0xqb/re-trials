@@ -11,14 +11,27 @@
    ["@material-ui/core/TableBody" :default TableBody]))
 
 
+(defn term-filter-fn [name-term item]
+  (not (empty?
+        (re-find
+         (re-pattern (str ".*" name-term ".*"))
+         (:name item)))))
+
 (def ^:const columns ["Name" "Description" "Archived?"])
 
 (defn trials-listings [trials on-save-trial]
   {:pre  [(fn? on-save-trial)
           (vector? trials)]}
-  (let [selected-trial (r/atom nil)]
+  (let [selected-trial (r/atom nil)
+        filter-term (r/atom "")]
     (fn [trials on-save-trial]
       [:> Paper
+
+       [editing/atom-input
+        {:label "Filter by name: "
+         :style {:width "30%"}}
+        filter-term]
+
        [:> TableContainer
         [:> Table
          [:> TableHead
@@ -26,9 +39,10 @@
            (for [column columns]
              ^{:key column}
              [:> TableCell column])]]
+
          [:> TableBody
           (if-not (empty? trials)
-            (for [trial trials]
+            (for [trial (filter (partial term-filter-fn @filter-term) trials)]
               ^{:key (:id trial)}
               [:> TableRow {:hover true
                             :style {:cursor "pointer"}
@@ -39,6 +53,7 @@
                 [:input {:type "checkbox"
                          :disabled true
                          :checked (boolean (:archived trial))}]]])
+
             [:> TableRow
              [:> TableCell
               {:align "center" :colspan 3}

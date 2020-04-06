@@ -49,16 +49,18 @@
         error (r/atom nil)
         save-handler (fn [_]
                        (reset! loading true)
-                       (let [req (on-submit (merge trial {:description @description
-                                                          :name @name
-                                                          :archived @archived?}))]
+                       (let [request (on-submit
+                                  (merge trial
+                                         {:description @description
+                                          :name @name
+                                          :archived @archived?}))]
                          (async/go
-                           (let [res (async/<! req)]
+                           (let [response (async/<! request)]
                              (reset! loading false)
-                             (when (not (nil? res))
-                               (if (:success res)
+                             (when (not (nil? response))
+                               (if (:success response)
                                  (on-success)
-                                 (reset! error (:msg res))))))))]
+                                 (reset! error (:msg response))))))))]
     (fn [] ;; skip props: no need to refresh args while editing.
       [:div
        {:style {:padding "1.2em"
