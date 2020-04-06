@@ -12,30 +12,40 @@
             ["@material-ui/core/styles" :refer [withStyles]]))
 
 
-(defonce global-store (r/atom [{:id 1, :name "No-AFTS-Here", :description "FOO", :archived true}
-                               {:id 2, :name "second", :description "BAR", :archived false} ]))
+(defonce global-store (r/atom []))
 
 ;; TODO mock the store
 ;; TODO define config for urls and constants
 
-;; hydrate the store (init)
-;; could be renamed to fetch
-(defn hydrate [] nil #_(async/go
-                   (let [response (async/<! (client/get "https://5dc26490.ngrok.io/trials"))]
-                     (println response)
-                     (when (:success response)
-                       (reset! global-store (:body response))))))
+(defn fetch-trials! []
+  (async/go
+    (let [response (async/<! (client/get "https://5dc26490.ngrok.io/trials"))]
+      (when (:success response)
+        (reset! global-store (:body response))))))
 
 ;; dev only
 (add-watch global-store :global-store-watcher (fn [key atom old-state new-state]
                                      (pprint new-state)))
 
-
 (defn edit-trial!
-  "Received complete or partial info of a trial, and edits it on the server."
+  "Receives complete or partial info of a trial, and edits it on the server.
+  Returns a channel that communicates response async."
   [{:keys [id] :as trial}]
-  (println "submiting trial " trial)
-  (client/post (str "https://5dc26490.ngrok.io/trial/" id) {:json-params trial}))
+  (let [caller-chan (async/chan)
+        http-chan (client/post (str "https://5dc26490.ngrok.io/trial/" id) {:json-params trial})]
+    (async/go
+      (let [response (async/<! http-chan)]
+        (when (not (nil? response))
+          (async/>! caller-chan
+                    (if (:success response)
+                      (do
+                        (fetch-trials!)
+                        {:success true})
+                      {:success false
+                       :msg (if (empty? (:body response))
+                              "Failed."
+                              (:body response))})))))
+    caller-chan))
 
 (defn root-component []
   [:div
@@ -53,11 +63,3 @@
   "mount root node for reagent tree"
   []
   (r/render [root-component] (js/document.getElementById "app")))
-
-
-;; REPL'ing ======================
-
-;; Doing a POST with cljs-http
-(comment (def answer (client/post "https://5dc26490.ngrok.io/trial/1" {:json-params {:name "No-AFTS-Here"}}))
-         (async/go (let [res (async/<! answer)]
-                     (println res))))

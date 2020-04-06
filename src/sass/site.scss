@@ -40,9 +40,6 @@ body {
 }
 
 h1, h2, h3 {
-    &::before {
-        content: "# ";
-    }
 }
 
 p {
@@ -63,6 +60,15 @@ a {
     color: #09f;
 }
 
-input {
-    font-family: $font-stack;
+input[type=text] {
+    height: 1.5em;
+    width: 50%;
+    padding: 0.5em;
+    font-size: 1em;
+}
+
+input[type=checkbox] {
+    font-size: 0.8em;
+    height: 1em;
+    width: 1em;
 }

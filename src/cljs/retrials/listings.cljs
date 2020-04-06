@@ -14,6 +14,8 @@
 (def ^:const columns ["Name" "Description" "Archived?"])
 
 (defn trials-listings [trials on-save-trial]
+  {:pre  [(fn? on-save-trial)
+          (vector? trials)]}
   (let [selected-trial (r/atom nil)]
     (fn [trials on-save-trial]
       [:> Paper
@@ -25,17 +27,22 @@
              ^{:key column}
              [:> TableCell column])]]
          [:> TableBody
-          (for [trial trials]
-            ^{:key (:id trial)}
-            [:> TableRow {:hover true
-                          :style {:cursor "pointer"}
-                          :on-click #(reset! selected-trial trial)}
-             [:> TableCell (:name trial)]
-             [:> TableCell (:description trial)]
+          (if-not (empty? trials)
+            (for [trial trials]
+              ^{:key (:id trial)}
+              [:> TableRow {:hover true
+                            :style {:cursor "pointer"}
+                            :on-click #(reset! selected-trial trial)}
+               [:> TableCell (:name trial)]
+               [:> TableCell (:description trial)]
+               [:> TableCell
+                [:input {:type "checkbox"
+                         :disabled true
+                         :checked (boolean (:archived trial))}]]])
+            [:> TableRow
              [:> TableCell
-              [:input {:type "checkbox"
-                       :disabled true
-                       :checked (boolean (:archived trial))}]]])]]]
+              {:align "center" :colspan 3}
+              "No trials available."]])]]]
 
        (when-let [trial-now @selected-trial]
          [editing/trial-dialog

@@ -4,7 +4,7 @@
 (defn main!
   "Main entry point- fetch initial data and mount react tree"
   []
-  (lib/hydrate)
+  (lib/fetch-trials!)
   (lib/mount-tree))
 
 (defn reload!

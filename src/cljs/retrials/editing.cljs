@@ -1,46 +1,92 @@
 (ns retrials.editing
   (:require
    [reagent.core :as r]
-   ["@material-ui/core/TextField" :default TextField]
+   [cljs.core.async :as async]
    ["@material-ui/core/Dialog" :default Dialog]
    ["@material-ui/core/DialogTitle" :default DialogTitle]
    ["@material-ui/core/Button" :default Button]
    ["@material-ui/core/Snackbar" :default Snackbar]
    ["@material-ui/icons/HighlightOff" :default HighlightIcon]
    ["@material-ui/core/IconButton" :default IconButton]
-   ))
+   ["@material-ui/core/CircularProgress" :default Loading]))
 
 (defn atom-input
-  "Ref-atom-aware input element, with on-change handler for ref-value prop."
+  "Ref-atom-aware input element.
+   TODO: in the future I'd probably reconsider having edit-form track editing state
+   in one map, and wouldn't have a need for an atom-aware input element."
   [props ref-value]
-  [:> TextField (merge props
-                       {:type "text"
-                        :value @ref-value
-                        :variant "outlined"
-                        :on-change #(reset! ref-value (-> % .-target .-value))})])
+  (let [id (gensym "input")]
+    [:<>
+     [:label {:for id} (:label props)]
+     [:input
+      (merge props
+             {:type "text"
+              :id id
+              :value @ref-value
+              :on-change #(reset! ref-value (-> % .-target .-value))})]]))
 
-(defn edit-form [trial on-submit]
+(defn atom-checkbox
+  "Atom-aware checkbox"
+  [props ref-value]
+  [:input {:type "checkbox"
+           :on-change #(swap! ref-value not)
+           :checked @ref-value}])
+
+(defn error-banner [error-text]
+  [:p {:style
+       {:color "red"
+        :margin "0 0 1em 0"}}
+   error-text])
+
+(defn edit-form [trial on-submit on-success]
   {:pre  [(fn? on-submit)
-          (map? trial)]} ;; experimenting with eq of "prop types"; could be disabled in prod with `:elide-asserts true`
-  (let [description (r/atom (:description trial))
-        name (r/atom (:name trial))]
-    ;; TODO handle async -> when 200, show success and refresh the store. when error, display err string
-    (fn [] ;; no need to repeat args as we don't refresh while editing
+          (map? trial)]}
+  (let [description (r/atom (:description trial)) ;; replace with editing map for all fields later
+        name (r/atom (:name trial))
+        archived? (r/atom (:archived trial))
+        ;; loading, error, and handler can be encapsulated/cleanup later.
+        loading (r/atom false)
+        error (r/atom nil)
+        save-handler (fn [_]
+                       (reset! loading true)
+                       (let [req (on-submit (merge trial {:description @description
+                                                          :name @name
+                                                          :archived @archived?}))]
+                         (async/go
+                           (let [res (async/<! req)]
+                             (reset! loading false)
+                             (when (not (nil? res))
+                               (if (:success res)
+                                 (on-success)
+                                 (reset! error (:msg res))))))))]
+    (fn [] ;; skip props: no need to refresh args while editing.
       [:div
-       {:style {:padding "1em" :display "flex" :flex-direction "column"}}
+       {:style {:padding "1.2em"
+                :display "flex"
+                :flex-direction "column"}}
 
        [atom-input {:label "Name"} name] [:br]
 
        [atom-input {:label "Description"} description] [:br]
 
+       ;; for requirement of implementing edit for two different types
+       [:label "Archived?"
+        [atom-checkbox {:id "archived" :type "checkbox"} archived?]] [:br]
+
+       (when-let [error-instance @error] [error-banner error-instance])
+
        [:> Button
-        {:on-click (fn [_] (on-submit (merge trial {:description @description :name @name})))
+        {:disabled @loading
+         :on-click save-handler
          :variant "contained"}
-        "Save"]])))
+        (if @loading [:> Loading] "Save")]])))
 
 (defn trial-dialog
-  ""
+  "Simple dialog used to display and edit a trial's name and description"
   [{:keys [trial on-close on-submit]}]
+  {:pre [(map? trial)
+         (fn? on-close)
+         (fn? on-submit)]}
   [:> Dialog
    {:aria-labelledby "Trial Edit Dialog"
     :on-close on-close
@@ -56,6 +102,7 @@
      :on-click on-close}
     [:> HighlightIcon]]
 
-   [:> DialogTitle (str "Edit Trial" " \"" (:name trial) "\"")]
+   [:> DialogTitle
+    (str "Edit Trial" " \"" (:name trial) "\"")]
 
-   [edit-form trial on-submit]])
+   [edit-form trial on-submit on-close]])
