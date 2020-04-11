@@ -31,21 +31,18 @@
   "Receives complete or partial info of a trial, and edits it on the server.
   Returns a channel that communicates response async."
   [{:keys [id] :as trial}]
-  (let [caller-chan (async/chan)
-        http-chan (client/post (str "https://5dc26490.ngrok.io/trial/" id) {:json-params trial})]
+  (let [http-chan (client/post (str "https://5dc26490.ngrok.io/trial/" id) {:json-params trial})]
     (async/go
       (let [response (async/<! http-chan)]
         (when (not (nil? response))
-          (async/>! caller-chan
-                    (if (:success response)
-                      (do
-                        (fetch-trials!)
-                        {:success true})
-                      {:success false
-                       :msg (if (empty? (:body response))
-                              "Failed."
-                              (:body response))})))))
-    caller-chan))
+          (if (:success response)
+            (do
+              (fetch-trials!)
+              {:success true})
+            {:success false
+             :msg (if (empty? (:body response))
+                    "Failed."
+                    (:body response))}))))))
 
 (defn root-component []
   [:div

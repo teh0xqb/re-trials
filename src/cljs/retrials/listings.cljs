@@ -41,23 +41,24 @@
              [:> TableCell column])]]
 
          [:> TableBody
-          (if-not (empty? trials)
-            (for [trial (filter (partial term-filter-fn @filter-term) trials)]
-              ^{:key (:id trial)}
-              [:> TableRow {:hover true
-                            :style {:cursor "pointer"}
-                            :on-click #(reset! selected-trial trial)}
-               [:> TableCell (:name trial)]
-               [:> TableCell (:description trial)]
-               [:> TableCell
-                [:input {:type "checkbox"
-                         :disabled true
-                         :checked (boolean (:archived trial))}]]])
+          (let [displayable-trials (filter (partial term-filter-fn @filter-term) trials)]
+            (if-not (empty? displayable-trials)
+              (for [trial displayable-trials]
+                ^{:key (:id trial)}
+                [:> TableRow {:hover true
+                              :style {:cursor "pointer"}
+                              :on-click #(reset! selected-trial trial)}
+                 [:> TableCell (:name trial)]
+                 [:> TableCell (:description trial)]
+                 [:> TableCell
+                  [:input {:type "checkbox"
+                           :disabled true
+                           :checked (boolean (:archived trial))}]]])
 
-            [:> TableRow
-             [:> TableCell
-              {:align "center" :colspan 3}
-              "No trials available."]])]]]
+              [:> TableRow
+               [:> TableCell
+                {:align "center" :colSpan 3}
+                "No trials available or no match for filter."]]))]]]
 
        (when-let [trial-now @selected-trial]
          [editing/trial-dialog
