@@ -24,6 +24,7 @@
    :history true})
 
 (defcard trials-list-2)
+
 (devcards/reagent [listings/trials-listings mock-trials identity])
 
 (defn ^:export main [] (devcards.core/start-devcard-ui!))

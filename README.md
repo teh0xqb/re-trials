@@ -30,6 +30,11 @@ TODO
 TODO
 
 ### Development
+```
+, s i                                         ; jack in clj
+(shadow.cljs.devtools.api/watch :app)         ; watch cljs build
+(shadow.cljs.devtools.api/nrepl-select :app)  : connect nrepl emacs to cljs :app build profile
+```
 
 TODO
 

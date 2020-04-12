@@ -10,7 +10,7 @@
                 ^:dev [cider/piggieback "0.4.2"]]
  :nrepl        {:port 9001}
 
- :dev-http {8080 "target/"}
+ :dev-http {8080 ["resources/public" "target/"]}
 
  :builds {:app {:output-dir "target/js"
                 :asset-path "."

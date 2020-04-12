@@ -3,6 +3,7 @@
    [reagent.core :as r]
    [retrials.editing :as editing]
    ["@material-ui/core/Paper" :default Paper]
+   ["@material-ui/core/Checkbox" :default Checkbox]
    ["@material-ui/core/TableContainer" :default TableContainer]
    ["@material-ui/core/Table" :default Table]
    ["@material-ui/core/TableCell" :default TableCell]
@@ -17,7 +18,7 @@
          (re-pattern (str ".*" name-term ".*"))
          (:name item)))))
 
-(def ^:const columns ["Name" "Description" "Archived?"])
+(def ^:const columns ["Name" "Description" "Archived"])
 
 (defn trials-listings [trials on-save-trial]
   {:pre  [(fn? on-save-trial)
@@ -28,8 +29,8 @@
       [:> Paper
 
        [editing/atom-input
-        {:label "Filter by name: "
-         :style {:width "30%"}}
+        {:label "Filter names "
+         :variant "filled"}
         filter-term]
 
        [:> TableContainer
@@ -51,9 +52,10 @@
                  [:> TableCell (:name trial)]
                  [:> TableCell (:description trial)]
                  [:> TableCell
-                  [:input {:type "checkbox"
-                           :disabled true
-                           :checked (boolean (:archived trial))}]]])
+                  [:> Checkbox
+                   {:disabled true
+                    :color "default"
+                    :checked (boolean (:archived trial))}]]])
 
               [:> TableRow
                [:> TableCell
