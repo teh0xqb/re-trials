@@ -10,6 +10,12 @@ Use the npm or yarn package managers to install dependencies:
 yarn install
 ```
 
+For prod build:
+```
+npx shadow-cljs release app ; prod build
+npx shadow-cljs run shadow.cljs.build-report app report.html ; report from prod build
+```
+
 See package.json's scripts for all available dev and release tasks.
 
 ## Notes

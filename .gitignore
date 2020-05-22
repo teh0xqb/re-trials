@@ -17,4 +17,4 @@ target/
 *~
 .#*
 
-.idea/
+dir-locals.el

@@ -57,7 +57,7 @@
    in one map, and wouldn't have a need for an atom-aware input element."
   [props ref-value]
   [text-field
-   (merge {:value @ref-value
+   (merge {:value @ref-value ;; or r/merge-props   !!
            :variant "outlined"
            :on-change #(reset! ref-value (-> % .-target .-value))}
           props)])

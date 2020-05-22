@@ -1,7 +1,7 @@
 {
     "name": "re-trials",
     "version": "0.0.1",
-    "main": "index.js",
+    "main": "main.js",
     "author": "Joel",
     "license": "MIT",
     "private": true,

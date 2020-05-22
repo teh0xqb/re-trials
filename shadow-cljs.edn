@@ -4,6 +4,13 @@
                 [reagent-utils "0.3.3"]
                 [cljs-http "0.1.46"] ;; w/ async channels; instead of fetch
 
+                [venantius/accountant "0.2.5"  ;; SPA navigation
+                 :exclusions [org.clojure/tools.reader]]
+                [metosin/reitit "0.3.10"] ;; router lib
+
+                [mount "0.1.16"] ;; state!
+                [tolitius/mount-up "0.1.2"] ;; logs start/stop mount events
+
                 ^:dev [nrepl "0.6.0"]
                 ^:dev [refactor-nrepl "2.5.0"]
                 ^:dev [cider/cider-nrepl "0.23.0"]
